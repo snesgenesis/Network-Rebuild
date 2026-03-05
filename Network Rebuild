@@ -12,19 +12,16 @@ echo "Stopping all forever processes..."
 forever stopall
 
 run_rebuild() {
-    WAIT_TIME=$1
 
     echo "Starting rebuild_network.js"
-    node scripts/rebuild_network.js &
-    NODE_PID=$!
+  node scripts/rebuild_network.js
 
-    echo "Waiting $WAIT_TIME seconds..."
-    sleep "$WAIT_TIME"
+sleep 10
+node scripts/rebuild_network.js &
+PID=$!
 
-    echo "Sending Ctrl+C to node process..."
-    kill -SIGINT $NODE_PID
-
-    wait $NODE_PID 2>/dev/null || true
+sleep 10
+kill -SIGINT $PID
 }
 
 echo "Restarting gateway service..."
