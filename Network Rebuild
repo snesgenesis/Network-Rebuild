@@ -19,7 +19,7 @@ shutdown_zigbee() {
 
     log "Step 1: Shutdown Zigbee network"
 
-    GATEWAY_DIR="/home/centegix/gateway"
+    GATEWAY_DIR="gateway"
 
     if [ ! -d "$GATEWAY_DIR" ]; then
         log "ERROR: Gateway directory not found: $GATEWAY_DIR"
