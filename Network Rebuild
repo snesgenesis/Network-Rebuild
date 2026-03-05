@@ -5,10 +5,7 @@ set -e
 echo "===== Centegix Zigbee Network Rebuild ====="
 
 # Go to gateway directory
-cd "$GATEWAY_DIR" || {
-    echo "Failed to enter $GATEWAY_DIR"
-    exit 1
-}
+cd "$GATEWAY_DIR" || exit 1
 
 echo "Stopping gateway services..."
 forever stopall || true
