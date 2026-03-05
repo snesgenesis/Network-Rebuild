@@ -39,7 +39,7 @@ run_rebuild () {
 run_rebuild 5
 run_rebuild 5
 run_rebuild 5
-run_rebuild 15
+run_rebuild 45
 
 echo ""
 echo "Restarting gateway service..."
