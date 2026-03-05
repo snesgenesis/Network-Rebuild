@@ -1,44 +1,71 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-echo "===== Centegix Network Rebuild ====="
+LOGFILE="/var/log/centegix-network-rebuild.log"
+LOCKFILE="/tmp/centegix_rebuild.lock"
+GATEWAY_DIR="/home/centegix/gateway"
 
-# Go to gateway directory
-cd /home/centegix/gateway || {
-    echo "Failed to change directory"
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOGFILE"
+}
+
+cleanup() {
+    rm -f "$LOCKFILE"
+}
+trap cleanup EXIT
+
+# Prevent multiple runs
+if [ -f "$LOCKFILE" ]; then
+    echo "Script already running."
+    exit 1
+fi
+touch "$LOCKFILE"
+
+log "===== Centegix Network Rebuild Started ====="
+
+# Verify required commands exist
+for cmd in node forever sudo; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        log "ERROR: $cmd not installed"
+        exit 1
+    fi
+done
+
+# Change directory
+cd "$GATEWAY_DIR" || {
+    log "ERROR: Cannot access $GATEWAY_DIR"
     exit 1
 }
 
-echo "Stopping all forever processes..."
-forever stopall
+log "Stopping all forever processes..."
+forever stopall || true
 
 run_rebuild() {
-    WAIT_TIME=$1
 
-    echo "Starting rebuild_network.js"
-    node scripts/rebuild_network.js &
-    NODE_PID=$!
+    for i in 1 2 3
+    do
+        log "Starting rebuild cycle $i"
 
-    echo "Waiting $WAIT_TIME seconds..."
-    sleep "$WAIT_TIME"
+        node scripts/rebuild_network.js &
+        PID=$!
 
-    echo "Sending Ctrl+C to node process..."
-    kill -SIGINT $NODE_PID
+        sleep 10
 
-    wait $NODE_PID 2>/dev/null || true
+        log "Stopping rebuild process (PID $PID)"
+        kill -SIGINT "$PID" 2>/dev/null || true
+        wait "$PID" 2>/dev/null || true
+    done
 }
 
-# Run rebuild cycles
-run_rebuild 5
-run_rebuild 5
-run_rebuild 5
-run_rebuild 15
+run_rebuild
 
-echo "Restarting gateway service..."
+log "Restarting gateway service..."
 
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
-forever --minUptime 1 start /home/centegix/gateway/index.js
+forever --minUptime 1 start "$GATEWAY_DIR/index.js"
 
-echo "Following logs..."
+log "Gateway service restarted"
+
+log "Following logs..."
 forever logs 0 -f
