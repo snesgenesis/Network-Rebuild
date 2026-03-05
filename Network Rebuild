@@ -1,0 +1,41 @@
+#!/bin/sh
+
+echo ""
+echo "===== Centegix Network rebuild ====="
+
+# Step 0: Hostname and time
+HOST=$(uname -a)
+[ -z "$HOST" ] && HOST="uname -a"
+echo "Running on $HOST at $(date)"
+
+# Step 1: Shutdown Zigbee network
+echo ""
+echo "1. Shutdown Zigbee network:"
+cd gateway"
+"foreverstopall"
+"node scripts/rebuild_network.js"
+"sleep 5"
+"# type "finish" to exit
+
+stty -echoctl # hide ^C
+
+# function called by trap
+other_commands() {
+    tput setaf 1
+    printf "\rSIGINT caught      "
+    tput sgr0
+    sleep 1
+    printf "\rType a command >>> "
+}
+
+trap 'other_commands' SIGINT
+
+input="$@"
+
+while true; do
+    printf "\rType a command >>> "
+    read input
+    [[ $input == finish ]] && break
+    bash -c "$input"
+done"
+
