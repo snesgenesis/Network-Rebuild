@@ -2,11 +2,6 @@
 
 set -e
 
-GATEWAY_DIR="/home/centegix/gateway"
-REBUILD_SCRIPT="scripts/rebuild_network.js"
-
-export FOREVER_ROOT=/tmp/forever
-
 echo "===== Centegix Zigbee Network Rebuild ====="
 
 # Go to gateway directory
