@@ -22,6 +22,24 @@ PID=$!
 
 sleep 10
 kill -SIGINT $PID
+
+node scripts/rebuild_network.js
+
+sleep 10
+node scripts/rebuild_network.js &
+PID=$!
+
+sleep 10
+kill -SIGINT $PID
+
+node scripts/rebuild_network.js
+
+sleep 10
+node scripts/rebuild_network.js &
+PID=$!
+
+sleep 10
+kill -SIGINT $PID
 }
 
 echo "Restarting gateway service..."
