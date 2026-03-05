@@ -7,7 +7,7 @@ echo "===== Centegix Zigbee Network Rebuild ====="
 echo Go to gateway directory
 cd /home/centegix/gateway || exit 1
 
-echo "Stopping gateway services..."
+echo "Stopping zigbee services..."
 forever stopall || true
 
 run_rebuild () {
@@ -34,7 +34,7 @@ run_rebuild 12
 run_rebuild 45
 
 echo ""
-echo "Restarting gateway service..."
+echo "Restarting zigbee service..."
 
 sudo -u centegix forever --minUptime 1 start "$GATEWAY_DIR/index.js"
 
