@@ -19,7 +19,7 @@ shutdown_zigbee() {
 
     log "Step 1: Shutdown Zigbee network"
 
-    GATEWAY_DIR="gateway"
+    GATEWAY_DIR="/home/centegix/gateway"
 
     cd /home/centegix/gateway || {
     echo "Failed to change directory"
