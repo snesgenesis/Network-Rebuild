@@ -5,11 +5,15 @@ set -e
 GATEWAY_DIR="/home/centegix/gateway"
 REBUILD_SCRIPT="scripts/rebuild_network.js"
 
+export FOREVER_ROOT=/tmp/forever
+
 echo "===== Centegix Zigbee Network Rebuild ====="
 
-# Go to gateway directory 
-
-cd /home/centegix/gateway || exit 1 
+# Go to gateway directory
+cd "$GATEWAY_DIR" || {
+    echo "Failed to enter $GATEWAY_DIR"
+    exit 1
+}
 
 echo "Stopping gateway services..."
 forever stopall || true
@@ -40,8 +44,7 @@ run_rebuild 45
 echo ""
 echo "Restarting gateway service..."
 
-sudo -u centegix FOREVER_ROOT=/tmp/forever \
-forever --minUptime 1 start /home/centegix/gateway/index.js
+sudo -u centegix forever --minUptime 1 start "$GATEWAY_DIR/index.js"
 
 echo ""
 echo "Following logs..."
