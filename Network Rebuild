@@ -2,42 +2,40 @@
 
 set -e
 
-echo "===== Centegix Zigbee Network Rebuild ====="
+echo ""
+echo "===== Centegix Network Rebuild ====="
+echo ""
 
-echo Go to gateway directory
-cd /home/centegix/gateway || exit 1
-
-echo "Stopping zigbee services..."
-forever stopall || true
-
-run_rebuild () {
-
-    WAIT=$1
-
-    echo ""
-    echo "Running rebuild_network.js (wait ${WAIT}s)..."
-
-    node "$REBUILD_SCRIPT" &
-    PID=$!
-
-    sleep "$WAIT"
-
-    echo "Stopping rebuild process (PID $PID)"
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# Run rebuild cycles
-run_rebuild 12
-run_rebuild 12
-run_rebuild 12
-run_rebuild 45
+# Step 0: Hostname and time
+HOST=$(uname -a)
+log "Running on $HOST"
+
+# Step 1: Shutdown Zigbee network
+shutdown_zigbee() {
+
+    log "Step 1: Shutdown Zigbee network"
+
+    GATEWAY_DIR="/home/centegix/gateway"
+
+    cd "$GATEWAY_DIR" || {
+        echo "Failed to change directory"
+        exit 1
+    }
+
+    echo ""
+
+    # Example shutdown command placeholder
+    # ./shutdown_zigbee.sh
+
+    log "Zigbee shutdown step complete"
+}
+
+shutdown_zigbee
 
 echo ""
-echo "Restarting zigbee service..."
-
-sudo -u centegix forever --minUptime 1 start "$GATEWAY_DIR/index.js"
-
+log "=== Network rebuild script complete ==="
 echo ""
-echo "Following logs..."
-forever logs 0 -f
