@@ -15,4 +15,5 @@ mycdfunction() {
   cd /home/centegix/gateway || exit 1
 }
 echo ""
+
 echo "===Done==="
