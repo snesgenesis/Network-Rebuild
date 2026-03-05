@@ -2,46 +2,51 @@
 
 set -e
 
-echo "===== Centegix Network Rebuild ====="
+GATEWAY_DIR="/home/centegix/gateway"
+REBUILD_SCRIPT="scripts/rebuild_network.js"
 
-# Go to gateway directory
+echo "===== Centegix Zigbee Network Rebuild ====="
 
-cd /home/centegix/gateway || exit 1
+# Verify directory exists
+if [ ! -d "$GATEWAY_DIR" ]; then
+    echo "ERROR: Gateway directory not found: $GATEWAY_DIR"
+    exit 1
+fi
 
-echo "Stopping all forever processes..."
-forever stopall || exit 1
+cd "$GATEWAY_DIR"
 
-run_rebuild() {
+echo "Stopping gateway services..."
+forever stopall || true
 
-    echo "Starting rebuild cycle 1"
-    node scripts/rebuild_network.js &
+run_rebuild () {
+
+    WAIT=$1
+
+    echo ""
+    echo "Running rebuild_network.js (wait ${WAIT}s)..."
+
+    node "$REBUILD_SCRIPT" &
     PID=$!
-    sleep 10
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
 
-    echo "Starting rebuild cycle 2"
-    node scripts/rebuild_network.js &
-    PID=$!
-    sleep 10
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
+    sleep "$WAIT"
 
-    echo "Starting rebuild cycle 3"
-    node scripts/rebuild_network.js &
-    PID=$!
-    sleep 10
+    echo "Stopping rebuild process (PID $PID)"
     kill -SIGINT "$PID" 2>/dev/null || true
     wait "$PID" 2>/dev/null || true
 }
 
-# Run rebuild procedure
-run_rebuild
+# Run rebuild cycles
+run_rebuild 5
+run_rebuild 5
+run_rebuild 5
+run_rebuild 15
 
+echo ""
 echo "Restarting gateway service..."
 
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
 forever --minUptime 1 start /home/centegix/gateway/index.js
 
+echo ""
 echo "Following logs..."
 forever logs 0 -f
