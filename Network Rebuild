@@ -1,20 +1,43 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -e
 
 echo ""
-echo "===== Centegix Network rebuild ====="
+echo "===== Centegix Network Rebuild ====="
+echo ""
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
 
 # Step 0: Hostname and time
 HOST=$(uname -a)
-[ -z "$HOST" ] && HOST="uname -a"
-echo "Running on $HOST at $(date)"
+log "Running on $HOST"
 
 # Step 1: Shutdown Zigbee network
-echo ""
-echo "1. Shutdown Zigbee network:"
+shutdown_zigbee() {
 
-mycdfunction() {
-  cd /home/centegix/gateway
+    log "Step 1: Shutdown Zigbee network"
+
+    GATEWAY_DIR="/home/centegix/gateway"
+
+    if [ ! -d "$GATEWAY_DIR" ]; then
+        log "ERROR: Gateway directory not found: $GATEWAY_DIR"
+        exit 1
+    fi
+
+    cd "$GATEWAY_DIR"
+
+    log "Changed directory to $GATEWAY_DIR"
+
+    # Example shutdown command placeholder
+    # ./shutdown_zigbee.sh
+
+    log "Zigbee shutdown step complete"
 }
 
+shutdown_zigbee
+
 echo ""
-echo "===Done==="
+log "=== Network rebuild script complete ==="
+echo ""
