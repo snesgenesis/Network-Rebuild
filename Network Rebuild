@@ -27,15 +27,3 @@ shutdown_zigbee() {
     }
 
     echo ""
-
-    # Example shutdown command placeholder
-    # ./shutdown_zigbee.sh
-
-    log "Zigbee shutdown step complete"
-}
-
-shutdown_zigbee
-
-echo ""
-log "=== Network rebuild script complete ==="
-echo ""
