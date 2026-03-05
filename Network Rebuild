@@ -11,5 +11,7 @@ echo "Running on $HOST at $(date)"
 # Step 1: Shutdown Zigbee network
 echo ""
 echo "1. Shutdown Zigbee network:
-cd 'gateway'
+mycdfunction() {
+  cd /home/centegix/gateway || exit 1
+}
 "done"
