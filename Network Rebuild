@@ -1,40 +1,39 @@
-#bash script.sh
+#!/usr/bin/env bash
 
 set -e
 
 echo "===== Centegix Network Rebuild ====="
 
-cd /home/centegix/gateway || exit 1
-
-echo "Stopping all forever processes..."
-forever stopall || true
-
-run_rebuild() {
-
-    echo "Starting rebuild cycle 1"
-    node scripts/rebuild_network.js &
-    PID=$!
-    sleep 10
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
-
-    echo "Starting rebuild cycle 2"
-    node scripts/rebuild_network.js &
-    PID=$!
-    sleep 10
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
-
-    echo "Starting rebuild cycle 3"
-    node scripts/rebuild_network.js &
-    PID=$!
-    sleep 10
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
+# Go to gateway directory
+cd /home/centegix/gateway || {
+    echo "Failed to change directory"
+    exit 1
 }
 
-# Run rebuild procedure
-run_rebuild
+echo "Stopping all forever processes..."
+forever stopall
+
+run_rebuild() {
+    WAIT_TIME=$1
+
+    echo "Starting rebuild_network.js"
+    node scripts/rebuild_network.js &
+    NODE_PID=$!
+
+    echo "Waiting $WAIT_TIME seconds..."
+    sleep "$WAIT_TIME"
+
+    echo "Sending Ctrl+C to node process..."
+    kill -SIGINT $NODE_PID
+
+    wait $NODE_PID 2>/dev/null || true
+}
+
+# Run rebuild cycles
+run_rebuild 5
+run_rebuild 5
+run_rebuild 5
+run_rebuild 15
 
 echo "Restarting gateway service..."
 
