@@ -1,71 +1,30 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -e
 
-LOGFILE="/var/log/centegix-network-rebuild.log"
-LOCKFILE="/tmp/centegix_rebuild.lock"
-GATEWAY_DIR="/home/centegix/gateway"
+echo "===== Centegix Network Rebuild ====="
 
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOGFILE"
-}
+cd /home/centegix/gateway || exit 1
 
-cleanup() {
-    rm -f "$LOCKFILE"
-}
-trap cleanup EXIT
-
-# Prevent multiple runs
-if [ -f "$LOCKFILE" ]; then
-    echo "Script already running."
-    exit 1
-fi
-touch "$LOCKFILE"
-
-log "===== Centegix Network Rebuild Started ====="
-
-# Verify required commands exist
-for cmd in node forever sudo; do
-    if ! command -v "$cmd" >/dev/null 2>&1; then
-        log "ERROR: $cmd not installed"
-        exit 1
-    fi
-done
-
-# Change directory
-cd "$GATEWAY_DIR" || {
-    log "ERROR: Cannot access $GATEWAY_DIR"
-    exit 1
-}
-
-log "Stopping all forever processes..."
+echo "Stopping all forever processes..."
 forever stopall || true
 
-run_rebuild() {
+for i in 1 2 3; do
+    echo "Starting rebuild cycle $i"
 
-    for i in 1 2 3
-    do
-        log "Starting rebuild cycle $i"
+    node scripts/rebuild_network.js &
+    PID=$!
 
-        node scripts/rebuild_network.js &
-        PID=$!
+    sleep 10
 
-        sleep 10
+    kill -SIGINT "$PID" 2>/dev/null || true
+    wait "$PID" 2>/dev/null || true
+done
 
-        log "Stopping rebuild process (PID $PID)"
-        kill -SIGINT "$PID" 2>/dev/null || true
-        wait "$PID" 2>/dev/null || true
-    done
-}
-
-run_rebuild
-
-log "Restarting gateway service..."
+echo "Restarting gateway service..."
 
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
-forever --minUptime 1 start "$GATEWAY_DIR/index.js"
+forever --minUptime 1 start /home/centegix/gateway/index.js
 
-log "Gateway service restarted"
-
-log "Following logs..."
+echo "Following logs..."
 forever logs 0 -f
