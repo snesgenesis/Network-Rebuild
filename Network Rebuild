@@ -27,12 +27,6 @@ run_rebuild() {
     wait $NODE_PID 2>/dev/null || true
 }
 
-# Run rebuild cycles
-run_rebuild 5
-run_rebuild 5
-run_rebuild 5
-run_rebuild 15
-
 echo "Restarting gateway service..."
 
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
