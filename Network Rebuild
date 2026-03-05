@@ -2,29 +2,40 @@
 
 set -e
 
+echo ""
 echo "===== Centegix Network Rebuild ====="
+echo ""
 
-cd /home/centegix/gateway || exit 1
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
 
-echo "Stopping all forever processes..."
-forever stopall || true
+# Step 0: Hostname and time
+HOST=$(uname -a)
+log "Running on $HOST"
 
-for i in 1 2 3; do
-    echo "Starting rebuild cycle $i"
+# Step 1: Shutdown Zigbee network
+shutdown_zigbee() {
 
-    node scripts/rebuild_network.js &
-    PID=$!
+    log "Step 1: Shutdown Zigbee network"
 
-    sleep 10
+    GATEWAY_DIR="/home/centegix/gateway"
 
-    kill -SIGINT "$PID" 2>/dev/null || true
-    wait "$PID" 2>/dev/null || true
-done
+    cd "$GATEWAY_DIR" || {
+        echo "Failed to change directory"
+        exit 1
+    }
 
-echo "Restarting gateway service..."
+    echo ""
 
-sudo -u centegix FOREVER_ROOT=/tmp/forever \
-forever --minUptime 1 start /home/centegix/gateway/index.js
+    # Example shutdown command placeholder
+    # ./shutdown_zigbee.sh
 
-echo "Following logs..."
-forever logs 0 -f
+    log "Zigbee shutdown step complete"
+}
+
+shutdown_zigbee
+
+echo ""
+log "=== Network rebuild script complete ==="
+echo ""
