@@ -21,14 +21,10 @@ shutdown_zigbee() {
 
     GATEWAY_DIR="gateway"
 
-    if [ ! -d "$GATEWAY_DIR" ]; then
-        log "ERROR: Gateway directory not found: $GATEWAY_DIR"
-        exit 1
-    fi
-
-    cd "$GATEWAY_DIR"
-
-    log "Changed directory to $GATEWAY_DIR"
+    cd /home/centegix/gateway || {
+    echo "Failed to change directory"
+    exit 1
+}
 
     # Example shutdown command placeholder
     # ./shutdown_zigbee.sh
