@@ -12,3 +12,4 @@ echo "Running on $HOST at $(date)"
 echo ""
 echo "1. Shutdown Zigbee network:
 cd 'gateway'
+"
