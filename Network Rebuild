@@ -36,9 +36,9 @@ run_rebuild () {
 }
 
 # Run rebuild cycles
-run_rebuild 5
-run_rebuild 5
-run_rebuild 5
+run_rebuild 12
+run_rebuild 12
+run_rebuild 12
 run_rebuild 45
 
 echo ""
