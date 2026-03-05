@@ -9,7 +9,7 @@ echo "===== Centegix Network Rebuild ====="
 cd /home/centegix/gateway || exit 1
 
 echo "Stopping all forever processes..."
-forever stopall || true
+forever stopall || exit 1
 
 run_rebuild() {
 
