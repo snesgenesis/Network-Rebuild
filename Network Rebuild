@@ -15,21 +15,21 @@ run_rebuild() {
     echo "Starting rebuild cycle 1"
     node scripts/rebuild_network.js &
     PID=$!
-    sleep 10
+    sleep 12
     kill -SIGINT $PID
     wait $PID 2>/dev/null || true
 
     echo "Starting rebuild cycle 2"
     node scripts/rebuild_network.js &
     PID=$!
-    sleep 10
+    sleep 12
     kill -SIGINT $PID
     wait $PID 2>/dev/null || true
 
     echo "Starting rebuild cycle 3"
     node scripts/rebuild_network.js &
     PID=$!
-    sleep 10
+    sleep 45
     kill -SIGINT $PID
     wait $PID 2>/dev/null || true
 }
@@ -42,5 +42,6 @@ echo "Restarting gateway service..."
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
 forever --minUptime 1 start /home/centegix/gateway/index.js
 
-echo "Following logs..."
+echo "Forever Logs..."
 forever logs 0 -f
+wait $PID 2>/dev/null || true
