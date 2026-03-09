@@ -44,4 +44,4 @@ forever --minUptime 1 start /home/centegix/gateway/index.js
 
 echo "Forever Logs..."
 forever logs 0 -f
-wait $PID 2>/dev/null || true
+>/dev/null || true
