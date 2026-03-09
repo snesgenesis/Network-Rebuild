@@ -37,7 +37,7 @@ run_rebuild() {
 # Run rebuild procedure
 run_rebuild
 
-echo "Restarting gateway service..."
+echo "Restarting zigbee service..."
 
 sudo -u centegix FOREVER_ROOT=/tmp/forever \
 forever --minUptime 1 start /home/centegix/gateway/index.js
